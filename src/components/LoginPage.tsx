@@ -17,9 +17,29 @@ export function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const { googleSignIn, getRoleForEmail, setRoleForEmail } = useAuth();
+  const { googleSignIn, getRoleForEmail, setRoleForEmail, createMockUser } = useAuth();
 
   const handleLogin = async () => {
+    // Static credentials for testing
+    const staticCredentials = [
+      { email: "admin@skywings.com", password: "admin123", role: "Admin" as const, name: "Admin User" },
+      { email: "user@skywings.com", password: "user123", role: "User" as const, name: "Test User" },
+    ];
+
+    // Check if credentials match static accounts
+    const staticUser = staticCredentials.find(
+      (cred) => cred.email === email && cred.password === password
+    );
+
+    if (staticUser) {
+      // Use static authentication with mock user
+      createMockUser(staticUser.email, staticUser.role, staticUser.name);
+      toast.success(`Logged in as ${staticUser.role}`);
+      navigate(staticUser.role === "Admin" ? "/admin" : "/user-dashboard");
+      return;
+    }
+
+    // Try Firebase authentication
     try {
       await signInWithEmailAndPassword(auth, email, password);
       // check persisted role first
@@ -27,9 +47,9 @@ export function LoginPage() {
         getRoleForEmail(email) || (userType === "admin" ? "Admin" : "User");
       // persist mapping if missing
       if (!getRoleForEmail(email)) setRoleForEmail(email, mapped);
-      navigate(mapped === "Admin" ? "/admin-dashboard" : "/user-dashboard");
+      navigate(mapped === "Admin" ? "/admin" : "/user-dashboard");
     } catch (err: any) {
-      toast.error(err?.message || "Sign in failed");
+      toast.error("Invalid email or password");
     }
   };
 
@@ -93,7 +113,11 @@ export function LoginPage() {
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
-                onClick={() => setUserType("user")}
+                onClick={() => {
+                  setUserType("user");
+                  setEmail("user@skywings.com");
+                  setPassword("user123");
+                }}
                 className={`p-4 rounded-xl border-2 transition-all ${
                   userType === "user"
                     ? "border-violet-500 bg-violet-50 text-violet-700"
@@ -107,7 +131,11 @@ export function LoginPage() {
               </button>
               <button
                 type="button"
-                onClick={() => setUserType("admin")}
+                onClick={() => {
+                  setUserType("admin");
+                  setEmail("admin@skywings.com");
+                  setPassword("admin123");
+                }}
                 className={`p-4 rounded-xl border-2 transition-all ${
                   userType === "admin"
                     ? "border-orange-500 bg-orange-50 text-orange-700"
@@ -207,7 +235,7 @@ export function LoginPage() {
                     toast.success("Signed in with Google");
                     navigate(
                       mapped === "Admin"
-                        ? "/admin-dashboard"
+                        ? "/admin"
                         : "/user-dashboard"
                     );
                   } catch (err: any) {

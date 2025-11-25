@@ -41,6 +41,7 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   getRoleForEmail: (email?: string | null) => "User" | "Admin" | undefined;
   setRoleForEmail: (email: string, role: "User" | "Admin") => void;
+  createMockUser: (email: string, role: "User" | "Admin", displayName?: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -96,6 +97,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Check for mock user in localStorage first
+    const mockUserData = localStorage.getItem("mock_user");
+    if (mockUserData) {
+      try {
+        const mockUser = JSON.parse(mockUserData) as AppUser;
+        setUser(mockUser);
+        setLoading(false);
+        return;
+      } catch (e) {
+        localStorage.removeItem("mock_user");
+      }
+    }
+
     const unsub = onAuthStateChanged(
       auth,
       (u) => {
@@ -147,7 +161,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = async () => {
+    // Clear mock user if exists
+    localStorage.removeItem("mock_user");
     await firebaseSignOut(auth);
+  };
+
+  const createMockUser = (email: string, role: "User" | "Admin", displayName?: string) => {
+    const mockUser: AppUser = {
+      uid: `mock_${Date.now()}`,
+      email,
+      displayName: displayName || email.split("@")[0],
+      photoURL: null,
+      createdAt: new Date().toISOString(),
+      lastSignIn: new Date().toISOString(),
+      role,
+    };
+    setRoleForEmail(email, role);
+    localStorage.setItem("mock_user", JSON.stringify(mockUser));
+    setUser(mockUser);
   };
 
   return (
@@ -161,6 +192,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signOut,
         getRoleForEmail,
         setRoleForEmail,
+        createMockUser,
       }}
     >
       {children}

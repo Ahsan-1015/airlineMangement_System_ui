@@ -1,17 +1,17 @@
 import {
-  collection,
-  deleteDoc,
-  doc,
-  getDocs,
-  getFirestore,
-  setDoc,
+    collection,
+    deleteDoc,
+    doc,
+    getDocs,
+    getFirestore,
+    setDoc,
 } from "firebase/firestore";
 import {
-  createContext,
-  ReactNode,
-  useContext,
-  useEffect,
-  useState,
+    createContext,
+    ReactNode,
+    useContext,
+    useEffect,
+    useState,
 } from "react";
 import app from "../firebase";
 import { useAuth } from "./AuthProvider";
@@ -48,6 +48,15 @@ export interface User {
   lastLogin: string;
 }
 
+export interface SystemStats {
+  totalFlights: number;
+  totalUsers: number;
+  activeFlights: number;
+  totalRevenue: number;
+  onTimeRate: number;
+  averageRating: number;
+}
+
 interface AdminContextType {
   flights: Flight[];
   users: User[];
@@ -59,14 +68,7 @@ interface AdminContextType {
   addUser: (user: Omit<User, "id">) => void;
   updateUser: (id: string, user: Partial<User>) => void;
   deleteUser: (id: string) => void;
-  getSystemStats: () => {
-    totalFlights: number;
-    totalUsers: number;
-    activeFlights: number;
-    totalRevenue: number;
-    onTimeRate: number;
-    averageRating: number;
-  };
+  getSystemStats: () => SystemStats;
 }
 
 const AdminContext = createContext<AdminContextType | undefined>(undefined);

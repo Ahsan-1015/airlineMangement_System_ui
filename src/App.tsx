@@ -1,6 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { AdminDashboard } from "./components/admin/AdminDashboard";
 import { AdminProvider } from "./components/AdminContext";
-import { AdminDashboard } from "./components/AdminDashboard";
 import { AuthProvider } from "./components/AuthProvider";
 import { BookingProvider } from "./components/BookingContext";
 import { BookingsPage } from "./components/BookingsPage";
@@ -10,7 +10,7 @@ import { Homepage } from "./components/Homepage";
 import { LoginPage } from "./components/LoginPage";
 import { RegisterPage } from "./components/RegisterPage";
 import { Toaster } from "./components/ui/sonner";
-import { UserDashboard } from "./components/UserDashboard";
+import { UserDashboard } from "./components/user/UserDashboard";
 
 type Page =
   | "home"
@@ -32,7 +32,8 @@ export default function App() {
               <Route path="/" element={<Homepage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
-              <Route path="/admin-dashboard" element={<AdminDashboard />} />
+              {/* <Route path="/admin-dashboard" element={<AdminDashboard />} /> */}
+              <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/user-dashboard" element={<UserDashboard />} />
               <Route path="/flights" element={<FlightsPage />} />
               <Route path="/bookings" element={<BookingsPage />} />

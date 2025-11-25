@@ -94,7 +94,7 @@ export function Homepage() {
                         : undefined;
                       navigate(
                         role === "Admin"
-                          ? "/admin-dashboard"
+                          ? "/admin"
                           : "/user-dashboard"
                       );
                     }}
@@ -184,7 +184,7 @@ export function Homepage() {
                       (u) => u.email === user.email && u.role === "Admin"
                     )
                   : false;
-                navigate(isAdmin ? "/admin-dashboard" : "/user-dashboard");
+                navigate(isAdmin ? "/admin" : "/user-dashboard");
               }}
             >
               Dashboard
